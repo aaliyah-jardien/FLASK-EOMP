@@ -64,7 +64,7 @@ init_item_table()
 username_table = {u.username: u for u in users}
 userid_table = {u.id: u for u in users}
 
-
+# AUTHENTICATION & IDENTITY
 def authenticate(username, password):
     user = username_table.get(username, None)
     if user and hmac.compare_digest(user.password.encode('utf-8'), password.encode('utf-8')):
