@@ -1,15 +1,15 @@
 /*FONT*/
-@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300);
+/*@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300);
 
 /*ICON*/
-@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+/*import url(https://fonts.googleapis.com/icon?family=Material+Icons);
 
 /*ANIMATE*/
-@import url(//daneden.github.io/animate.css/animate.min.css);
-@import url(https://jaruwat.pohong.me/theme/default/css/bubbles.css);
+/*@import url(//daneden.github.io/animate.css/animate.min.css);
+/*@import url(https://jaruwat.pohong.me/theme/default/css/bubbles.css);
 
 body {
-  margin: 0;  
+  margin: 0;
   line-height: 1.5;
   font-family: 'Source Sans Pro', sans-serif;
   text-align: left;
@@ -23,7 +23,7 @@ body {
   animation: op 3s;
 }
 
-.bg {  
+.bg {
   -webkit-animation: bg-fadein 20s; /* Safari and Chrome */
   -moz-animation: bg-fadein 20s; /* Firefox */
   -ms-animation: bg-fadein 20s; /* Internet Explorer */
@@ -31,7 +31,7 @@ body {
   animation: bg-fadein 20s;
   opacity: 0.5;
   content: "";
-  background: url(https://jaruwat.pohong.me/theme/default/bg.png);  
+  background: url(https://jaruwat.pohong.me/theme/default/bg.png);
   top: 0;
   left: 0;
   bottom: 0;
@@ -71,7 +71,7 @@ body {
   font-weight: 500;
   margin-top: 0;
   margin-bottom: 0;
-  
+
 }
 
 .container a:hover {
@@ -103,7 +103,7 @@ body {
   text-indent: 0px;
   }
 
-.fa-ic { 
+.fa-ic {
   position: absolute;
   top: 8px;
   left: 20px;
@@ -184,7 +184,7 @@ body {
 
 .footer{
   text-decoration: none;
-  position: absolute; 
+  position: absolute;
   display: block;
   color: white;
   right: 0;
@@ -199,7 +199,7 @@ body {
 
 .l3lackMegas{
   text-decoration: none;
-  position: absolute; 
+  position: absolute;
   display: block;
   color: white;
   left: 0;
@@ -252,7 +252,7 @@ body {
             to   { opacity: 1; }
         }​
 
-@keyframes bg-fadein {
+        @keyframes bg-fadein {
             from { opacity: 0; }
             to   { opacity: 1; }
         }
@@ -281,7 +281,7 @@ body {
             to   { opacity: 0.5; }
         }​
 
-@keyframes op {
+        @keyframes op {
             from { background-color: #fff; }
             to   { background-color: #0c0a1e; }
         }
