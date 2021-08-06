@@ -1,6 +1,9 @@
 import hmac
 import sqlite3
 import datetime
+from flask import Flask, render_template, request
+from flask_mail import Mail, Message
+
 
 from flask import Flask, request, jsonify
 from flask_jwt import JWT, jwt_required, current_identity
@@ -18,12 +21,12 @@ def init_user_table():
     conn = sqlite3.connect('aj_store.db')
     print("Opened database successfully")
 
-    conn.execute("CREATE TABLE IF NOT EXISTS user(user_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    conn.execute("CREATE TABLE IF NOT EXISTS user1(user_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                  "first_name TEXT NOT NULL,"
                  "last_name TEXT NOT NULL,"
                  "username TEXT NOT NULL,"
-                 "email TEXT NOT NULL UNIQUE,"
-                 "phone TEXT NOT NULL UNIQUE,"
+                 "email TEXT NOT NULL,"
+                 "phone TEXT NOT NULL,"
                  "password TEXT NOT NULL)")
     print("user table created successfully")
     conn.close()
@@ -32,13 +35,13 @@ def init_user_table():
 init_user_table()
 
 
-def init_item_table():
+def init_product_table():
     with sqlite3.connect('aj_store.db') as conn:
         conn.execute("CREATE TABLE IF NOT EXISTS item (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                     "item_name TEXT NOT NULL,"
+                     "product_name TEXT NOT NULL,"
                      "description TEXT NOT NULL,"
-                     "item_price TEXT NOT NULL,"
-                     "item_barcode TEXT NOT NULL)")
+                     "product_price TEXT NOT NULL,"
+                     "product_barcode TEXT NOT NULL)")
     print("blog table created successfully.")
 
 
@@ -51,7 +54,7 @@ def fetch_users():
         new_data = []
 
         for data in users:
-            new_data.append(User(data[0], data[1], data[4]))
+            new_data.append(User(data[0], data[3], data[6]))
     return new_data
 
 
@@ -59,10 +62,11 @@ users = fetch_users()
 
 
 init_user_table()
-init_item_table()
+init_product_table()
 
 username_table = {u.username: u for u in users}
 userid_table = {u.id: u for u in users}
+
 
 # AUTHENTICATION & IDENTITY
 def authenticate(username, password):
@@ -79,6 +83,14 @@ def identity(payload):
 app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'super-secret'
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'aaliyahjar13@gmail.com'
+app.config['MAIL_PASSWORD'] = 'icecream2002%'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
 
 jwt = JWT(app, authenticate, identity)
 
@@ -104,49 +116,52 @@ def user_registration():
 
         with sqlite3.connect("aj_store.db") as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO user("
+            cursor.execute("INSERT INTO user1("
                            "first_name,"
                            "last_name,"
                            "username,"
                            "email,"
-                           "phone,"                   
+                           "phone,"
                            "password) VALUES(?, ?, ?, ?, ?, ?)", (first_name, last_name, username, email, phone, password))
             conn.commit()
+            msg = Message('Hello Message', sender='aaliyahjar13@gmail.com', recipients=[email])
+            msg.body = "Thanks for shopping at my business."
+            mail.send(msg)
             response["message"] = "success"
             response["status_code"] = 201
         return response
 
 
-@app.route('/create-blog/', methods=["POST"])
-def create_blog():
+@app.route('/create-product/', methods=["POST"])
+def create_item():
     response = {}
 
     if request.method == "POST":
 
-        item_name = request.form['item_name']
+        product_name = request.form['product_name']
         description = request.form['description']
-        item_price = request.form['item_price']
-        item_barcode = request.form['item_barcode']
+        product_price = request.form['product_price']
+        item_barcode = request.form['product_barcode']
 
         with sqlite3.connect('aj_store.db') as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO item("
-                           "item_name,"
+                           "product_name,"
                            "description,"
-                           "item_price,"
-                           "item_barcode) VALUES(?, ?, ?, ?)", (item_name, description, item_price, item_barcode))
+                           "product_price,"
+                           "product_barcode) VALUES(?, ?, ?, ?)", (product_name, description, product_price, item_barcode))
             conn.commit()
             response["status_code"] = 201
             response['description'] = "Blog post added successfully"
         return response
 
 
-@app.route('/get-blogs/', methods=["GET"])
-def get_blogs():
+@app.route('/get-product/', methods=["GET"])
+def get_item():
     response = {}
     with sqlite3.connect("aj_store.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM item")
+        cursor.execute("SELECT * FROM product")
 
         posts = cursor.fetchall()
 
@@ -155,15 +170,15 @@ def get_blogs():
     return response
 
 
-@app.route("/delete-post/<int:post_id>")
+@app.route("/delete-product/<int:post_id>")
 def delete_post(post_id):
     response = {}
     with sqlite3.connect("aj_store.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM item WHERE id=" + str(post_id))
+        cursor.execute("DELETE FROM product WHERE id=" + str(post_id))
         conn.commit()
         response['status_code'] = 200
-        response['message'] = "blog post deleted successfully."
+        response['message'] = "product post deleted successfully."
     return response
 
 
@@ -178,10 +193,10 @@ def edit_post(post_id):
             put_data = {}
 
             if incoming_data.get("") is not None:
-                put_data["item_name"] = incoming_data.get("item_name")
+                put_data["product_name"] = incoming_data.get("product_name")
                 with sqlite3.connect('aj_store.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE item SET item_name =? WHERE id=?", (put_data["item_name"], post_id))
+                    cursor.execute("UPDATE product SET product_name =? WHERE id=?", (put_data["product_name"], post_id))
                     conn.commit()
                     response['message'] = "Update was successfully"
                     response['status_code'] = 200
@@ -191,46 +206,46 @@ def edit_post(post_id):
 
                 with sqlite3.connect('aj_store.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE item SET description =? WHERE id=?", (put_data["description"], post_id))
+                    cursor.execute("UPDATE product SET description =? WHERE id=?", (put_data["description"], post_id))
                     conn.commit()
 
                     response["description"] = "Content updated successfully"
                     response["status_code"] = 200
 
-            if incoming_data.get("item_price") is not None:
-                put_data['item_price'] = incoming_data.get('item_price')
+            if incoming_data.get("product_price") is not None:
+                put_data['product_price'] = incoming_data.get('product_price')
 
                 with sqlite3.connect('aj_store.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE item SET item_price =? WHERE id=?", (put_data["item_price"], post_id))
+                    cursor.execute("UPDATE product SET product_price =? WHERE id=?", (put_data["product_price"], post_id))
                     conn.commit()
 
-                    response["item_price"] = "Content updated successfully"
+                    response["product_price"] = "Content updated successfully"
                     response["status_code"] = 200
 
             if incoming_data.get("item_barcode") is not None:
-                put_data['item_barcode'] = incoming_data.get('item_barcode')
+                put_data['product_barcode'] = incoming_data.get('product_barcode')
 
                 with sqlite3.connect('aj_store.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE item SET item_price =? WHERE id=?", (put_data["item_barcode"], post_id))
+                    cursor.execute("UPDATE item SET item_price =? WHERE id=?", (put_data["product_barcode"], post_id))
                     conn.commit()
 
-                    response["item_barcodes"] = "Content updated successfully"
+                    response["product_barcodes"] = "Content updated successfully"
                     response["status_code"] = 200
     return response
 
 
-@app.route('/get-post/<int:post_id>/', methods=["GET"])
+@app.route('/view-product/<int:post_id>/', methods=["GET"])
 def get_post(post_id):
     response = {}
 
     with sqlite3.connect("aj_store.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM post WHERE id=" + str(post_id))
+        cursor.execute("SELECT * FROM item WHERE id=" + str(post_id))
 
         response["status_code"] = 200
-        response["description"] = "Blog post retrieved successfully"
+        response["description"] = "Item retrieved successfully"
         response["data"] = cursor.fetchone()
 
     return jsonify(response)
