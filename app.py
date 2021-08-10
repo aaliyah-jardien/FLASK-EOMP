@@ -42,7 +42,7 @@ def init_product_table():
                      "description TEXT NOT NULL,"
                      "product_price TEXT NOT NULL,"
                      "product_barcode TEXT NOT NULL)")
-    print("blog table created successfully.")
+    print("item table created successfully.")
 
 
 def fetch_users():
