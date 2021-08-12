@@ -48,7 +48,7 @@ def init_product_table():
 def fetch_users():
     with sqlite3.connect('aj_store.db') as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM user")
+        cursor.execute("SELECT * FROM user1")
         users = cursor.fetchall()
 
         new_data = []
@@ -86,7 +86,7 @@ app.config['SECRET_KEY'] = 'super-secret'
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'aaliyahjar13@gmail.com'
+app.config['MAIL_USERNAME'] = 'aaliyahjardien4@gmail.com'
 app.config['MAIL_PASSWORD'] = 'icecream2002%'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
@@ -124,7 +124,7 @@ def user_registration():
                            "phone,"
                            "password) VALUES(?, ?, ?, ?, ?, ?)", (first_name, last_name, username, email, phone, password))
             conn.commit()
-            msg = Message('Hello Message', sender='aaliyahjar13@gmail.com', recipients=[email])
+            msg = Message('Hello Message', sender='aaliyahjardien4@gmail.com', recipients=[email])
             msg.body = "Thanks for shopping at my business."
             mail.send(msg)
             response["message"] = "success"
