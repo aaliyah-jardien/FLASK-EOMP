@@ -61,7 +61,6 @@ def fetch_users():
 users = fetch_users()
 
 
-init_user_table()
 init_product_table()
 
 username_table = {u.username: u for u in users}
@@ -133,7 +132,7 @@ def user_registration():
 
 
 @app.route('/create-product/', methods=["POST"])
-def create_item():
+def create_product():
     response = {}
 
     if request.method == "POST":
@@ -141,7 +140,7 @@ def create_item():
         product_name = request.form['product_name']
         description = request.form['description']
         product_price = request.form['product_price']
-        item_barcode = request.form['product_barcode']
+        product_barcode = request.form['product_barcode']
 
         with sqlite3.connect('aj_store.db') as conn:
             cursor = conn.cursor()
@@ -149,7 +148,7 @@ def create_item():
                            "product_name,"
                            "description,"
                            "product_price,"
-                           "product_barcode) VALUES(?, ?, ?, ?)", (product_name, description, product_price, item_barcode))
+                           "product_barcode) VALUES(?, ?, ?, ?)", (product_name, description, product_price, product_barcode))
             conn.commit()
             response["status_code"] = 201
             response['description'] = "Blog post added successfully"
@@ -157,11 +156,11 @@ def create_item():
 
 
 @app.route('/get-product/', methods=["GET"])
-def get_item():
+def get_product():
     response = {}
     with sqlite3.connect("aj_store.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM product")
+        cursor.execute("SELECT * FROM item")
 
         posts = cursor.fetchall()
 
@@ -171,11 +170,11 @@ def get_item():
 
 
 @app.route("/delete-product/<int:post_id>")
-def delete_post(post_id):
+def delete_product(post_id):
     response = {}
     with sqlite3.connect("aj_store.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM product WHERE id=" + str(post_id))
+        cursor.execute("DELETE FROM item WHERE id=" + str(post_id))
         conn.commit()
         response['status_code'] = 200
         response['message'] = "product post deleted successfully."
@@ -184,7 +183,7 @@ def delete_post(post_id):
 
 @app.route('/edit-post/<int:post_id>/', methods=["PUT"])
 @jwt_required()
-def edit_post(post_id):
+def edit_product(post_id):
     response = {}
 
     if request.method == "PUT":
@@ -196,7 +195,7 @@ def edit_post(post_id):
                 put_data["product_name"] = incoming_data.get("product_name")
                 with sqlite3.connect('aj_store.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE product SET product_name =? WHERE id=?", (put_data["product_name"], post_id))
+                    cursor.execute("UPDATE item SET product_name =? WHERE id=?", (put_data["product_name"], post_id))
                     conn.commit()
                     response['message'] = "Update was successfully"
                     response['status_code'] = 200
@@ -206,7 +205,7 @@ def edit_post(post_id):
 
                 with sqlite3.connect('aj_store.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE product SET description =? WHERE id=?", (put_data["description"], post_id))
+                    cursor.execute("UPDATE item SET description =? WHERE id=?", (put_data["description"], post_id))
                     conn.commit()
 
                     response["description"] = "Content updated successfully"
@@ -217,7 +216,7 @@ def edit_post(post_id):
 
                 with sqlite3.connect('aj_store.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE product SET product_price =? WHERE id=?", (put_data["product_price"], post_id))
+                    cursor.execute("UPDATE item SET product_price =? WHERE id=?", (put_data["product_price"], post_id))
                     conn.commit()
 
                     response["product_price"] = "Content updated successfully"
@@ -237,7 +236,7 @@ def edit_post(post_id):
 
 
 @app.route('/view-product/<int:post_id>/', methods=["GET"])
-def get_post(post_id):
+def view_product(post_id):
     response = {}
 
     with sqlite3.connect("aj_store.db") as conn:
@@ -245,7 +244,7 @@ def get_post(post_id):
         cursor.execute("SELECT * FROM item WHERE id=" + str(post_id))
 
         response["status_code"] = 200
-        response["description"] = "Item retrieved successfully"
+        response["description"] = "Product retrieved successfully"
         response["data"] = cursor.fetchone()
 
     return jsonify(response)
