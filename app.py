@@ -1,14 +1,14 @@
+# FLASK IMPORTS
 import hmac
 import sqlite3
-import datetime
 from flask import Flask, render_template, request
 from flask_mail import Mail, Message
-
+from flask_cors import CORS
 
 from flask import Flask, request, jsonify
 from flask_jwt import JWT, jwt_required, current_identity
 
-
+# USER NAME AND PASSWORD IN CLASS
 class User(object):
     def __init__(self, id, username, password):
         self.id = id
@@ -79,6 +79,7 @@ def identity(payload):
     return userid_table.get(user_id, None)
 
 
+# CREATING APP
 app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'super-secret'
@@ -99,7 +100,7 @@ jwt = JWT(app, authenticate, identity)
 def protected():
     return '%s' % current_identity
 
-
+# ROUTE FOR EDIT PRODUCTS IN DATABASE
 @app.route('/user-registration/', methods=["POST"])
 def user_registration():
     response = {}
@@ -130,7 +131,7 @@ def user_registration():
             response["status_code"] = 201
         return response
 
-
+# ROUTE FOR CREATING PRODUCTS IN DATABASE
 @app.route('/create-product/', methods=["POST"])
 def create_product():
     response = {}
@@ -154,7 +155,7 @@ def create_product():
             response['description'] = "Blog post added successfully"
         return response
 
-
+# ROUTE FOR GETTING PRODUCTS IN DATABASE
 @app.route('/get-product/', methods=["GET"])
 def get_product():
     response = {}
@@ -168,7 +169,7 @@ def get_product():
     response['data'] = posts
     return response
 
-
+# ROUTE FOR DELETING PRODUCTS IN DATABASE
 @app.route("/delete-product/<int:post_id>")
 def delete_product(post_id):
     response = {}
@@ -180,7 +181,7 @@ def delete_product(post_id):
         response['message'] = "product post deleted successfully."
     return response
 
-
+# ROUTE FOR EDIT PRODUCTS IN DATABASE
 @app.route('/edit-post/<int:post_id>/', methods=["PUT"])
 @jwt_required()
 def edit_product(post_id):
@@ -234,7 +235,7 @@ def edit_product(post_id):
                     response["status_code"] = 200
     return response
 
-
+# ROUTE FOR VIEWING PRODUCTS IN DATABASE
 @app.route('/view-product/<int:post_id>/', methods=["GET"])
 def view_product(post_id):
     response = {}
@@ -250,6 +251,7 @@ def view_product(post_id):
     return jsonify(response)
 
 
+# RUNNING APP
 if __name__ == '__main__':
     app.run(debug=True)
 
