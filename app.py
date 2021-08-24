@@ -4,7 +4,6 @@ import sqlite3
 from flask import Flask, render_template, request
 from flask_mail import Mail, Message
 from flask_cors import CORS
-
 from flask import Flask, request, jsonify
 from flask_jwt import JWT, jwt_required, current_identity
 
@@ -81,6 +80,7 @@ def identity(payload):
 
 # CREATING APP
 app = Flask(__name__)
+CORS(app)
 app.debug = True
 app.config['SECRET_KEY'] = 'super-secret'
 
